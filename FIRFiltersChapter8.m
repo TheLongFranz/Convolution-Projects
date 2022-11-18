@@ -1,6 +1,5 @@
 %% Add dependencies and reset the environment
-% addpath('Functions'); addpath('AudioSamples');
-clear;clc;close
+addpath('Functions'); addpath('AudioSamples'); clear;clc;close
 % -------------------------------------------------------------------------
 % Notes for Digital Audio Theory - A Practical Guide Chapter 8: FIR Filters
 % -------------------------------------------------------------------------
@@ -51,15 +50,19 @@ Assuming a gain of 1, h may be written as
 %}
 % -------------------------------------------------------------------------
 %% 8.3 Convolution
-%{ 
-The impulse response for convolution is x[N] + h[N] - 1. That is the length
-of a convolution between two signals
+%{
+Convolution can be defined as a Finite Impulse Response Filter with an
+impulse response of the length of the first function x[N] + the length of the
+second function h[N] -1.
 
 Convolution has the following properties
 1. Commutative -  h[n] * x[n] = x[n] * h[n]
 2. Associative -  (x[n] * h[n]) * g[n] = x[n] * (h[n] * g[n])
 3. Linear      -  x[n]* (a⋅h[n]+b⋅g[n]) = a⋅(x[n] * h[n])+b⋅(x[n] * g[n])
 %}
+h3 = audioread("AudioSamples/SilverVerb_IR.wav");
+x3 = impulse(1, .001, 48000);
+convHX = convolve(h3, x3)
 % -------------------------------------------------------------------------
 %% 8.4 Cross-correlation
 % -------------------------------------------------------------------------
@@ -72,43 +75,3 @@ Convolution has the following properties
 %% 8.8 Project – FIR filters
 
 %% Summary
-h3 = audioread("AudioSamples/SilverVerb_IR.wav");
-x3 = impulse(1, 1, 48000);
-convHX = convolve(h3, x3)
-%% Functions
-function [y] = FIRFilter(x, k, a)
-% Convert the input signal to a row vector
-x = [x, 0]; % Zero pad 'x' to allow for the size increase due to the filter order
-% in c++ x.push_back(0)
-idx = 1; idx1 = 1; % Reset before each loop
-% fprintf('\nOutput\n');
-for n = 1:length(x)
-    %     fprintf(['Loop ' num2str(n) ': ']);
-    if n == 1
-        y(n) = x(n);
-        %         fprintf(['y(' num2str(n) ') = ' num2str(x(n)) '\n']);
-    else
-        y(n) = x(n) + a*x(idx);
-        %         fprintf(['y(' num2str(n) ') = ' num2str(x(n)) '+' num2str(a) '*' num2str(x(idx)) ' = ' num2str(y(n)) '\n']);
-    end
-    idx = idx1;
-    idx1 = n+1;
-end
-end
-function [y] = convolve(h, x)
-% Prepare Output
-len = length(x)+length(h)-1;
-y=zeros(len,1);
-for n=0:len-1
-    % for every k from 0 to n; except before complete overlap
-    % when we can stop at the length of h
-    for k=0:min(length(h)-1,n)
-        % check to see if h has shifted beyond the bounds of x
-        if ((n-k)+1 < length(x))
-            % ‘+1’ in every array argument since Matlab sequences start
-            % at index 1 (and not 0, like other programming languages)
-            y(n+1) = y(n+1) + h(k+1)*x((n-k)+1);
-        end
-    end
-end
-end

@@ -1,0 +1,19 @@
+% fftconvolve
+addpath('Functions'); addpath('AudioSamples'); clear;clc;close
+% Speed Up convolve function
+[h, fs] = audioread("AudioSamples/SilverVerb_IR.wav");
+[h, hSide] = midSideEncode(h);
+[N, C] = size(h);
+x = zeros(length(h), C);
+x(1) = 1;
+
+for n = 1:1000
+tic
+y = ifft(fft(x) .* fft(h)); % Circular Convolution
+CircularConvolutionTime = toc;
+
+tic
+y2 = conv(x, h, 'full');
+LinearConvolutionTime = toc;
+end
+
