@@ -27,7 +27,7 @@ is equal to the length of the input plus the order of the filter."
 x2 = [.5 -.4 .3 -.2 .1]; y2 = FIRFilter(x2, 1, .5); % Input->Output
 % Expected results [.5 -.15 .1 -.05 .0 .05]
 % Analysis
-% ================================================================
+% =========================================================================
 subplot(1, 2, 1); FIRPlot(x1, y1); subplot(1, 2, 2); FIRPlot(x2, y2);
 % -------------------------------------------------------------------------
 %% 8.2 Impulse response
@@ -82,16 +82,27 @@ y[3] = h[0]⋅x[3] + h[1]⋅x[2] + h[2]⋅x[1] + h[3]⋅x[0] = (1 * 8 + 2 * 7 + 
 ...etc
 %}
 % Analysis
-% ================================================================
+% =========================================================================
 close; plot(h); hold on; plot(x); plot(yLin); plot(yCirc); hold off; 
 legend(["h[n]" "x[n]" "cLin[n]" "cCirc[n]"]);
 title(["Convolution of two arbitrary signals " num2str(h) " and " num2str(x)])
 xlabel('Time'); ylabel('Magnitude');
 % -------------------------------------------------------------------------
 %% 8.4 Cross-correlation
+%{
+Cross-Corellation is related to convolution but with one main difference,
+'h' is not time-reversed. This results in a comparison between h & x where
+the output measurements are (1) similarity between the time-lagged signals
+& (2) the point at which peak similarity occurs. Polarity of the two signals 
+does not change the magnitude of the output, only the sign of it. 
 
+8.4.1 Programming Example: Time-Delay Estimation ==========================
+This section is a quick overview for the uses of Cross corellation, such as
+time delay estimation and matched filtering (transient detection).
+%}
 % -------------------------------------------------------------------------
 %% 8.5 FIR filter phase
+
 % -------------------------------------------------------------------------
 %% 8.6 Designing FIR filters
 % -------------------------------------------------------------------------
