@@ -64,18 +64,27 @@ We will demonstrate using filter with the following impulse response
 (Remembering that the impulse response is determined by the coefficients)
 h[n] = [a0, a1, a2, a3] on an arbitrary signal x.
 
+The convolution matrix (Generally the IR Signal) can also be called the
+kernel.
+
+By using an N point FFT we can force the circular convolution to be
+identical to the linear convolution.
 %}
-x3 = [1 2 3 4] % h
-x4 = [5 6 7 8] % x
-
-y3 = convolve(x3, x4);
-y4 = conv(x3, x4)
-
+h = 1:4; % h
+x = 5:8; % x
+y = convolve(h, x);
+close
+plot(linspace(0, 7, 4), h)
+hold on
+plot(linspace(0, 7, 4), x)
+plot(y)
+legend(["h[n]" "x[n]" "c[n]"])
+title(["Convolution of two arbitrary signals " num2str(h) " and " num2str(x)])
+%          k    n
 % y[0] = h[0]⋅x[0] = (1 * 5) = 5
 % y[1] = h[0]⋅x[1] + h[1]⋅x[0] = (1 * 6 + 2 * 5) = 16
 % y[2] = h[0]⋅x[2] + h[1]⋅x[1] + h[2]⋅x[0] = (1 * 7 + 2 * 6 + 3 * 5) = 34
 % y[3] = h[0]⋅x[3] + h[1]⋅x[2] + h[2]⋅x[1] + h[3]⋅x[0] = (1 * 8 + 2 * 7 + 3 * 6 + 4 * 5) = 60
-% y[4] = h[0]⋅x[0] + h[1]⋅x[3] + h[2]⋅x[2] + h[3]⋅x[1] + h[4] * x[0]
 
 % h3 = audioread("AudioSamples/SilverVerb_IR.wav");
 % x3 = impulse(1, .001, 48000);

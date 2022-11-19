@@ -1,14 +1,9 @@
 function y = reverse(x)
-tic
-
-[N, C] = size(x);
-y = zeros(N, C);
-
-idx = N:-1:1;
-reverseIdx = 1:1:N;
-
-for c = 1:C
-    y(reverseIdx, c) = x(idx, c);
-end
-reverseFunctionTimeElapsed = toc
+[N, C] = size(x);       % Get the size of the input
+y = zeros(N, C);        % Preallocate storage for the output
+reverseIdx = N:-1:1;    % Index counting from max->0
+idx = 1:1:N;            % Index counting from 0->max
+    for c = 1:C
+        y(idx, c) = x(reverseIdx, c);
+    end
 end
