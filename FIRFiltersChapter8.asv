@@ -97,15 +97,61 @@ the output measurements are (1) similarity between the time-lagged signals
 does not change the magnitude of the output, only the sign of it. 
 
 8.4.1 Programming Example: Time-Delay Estimation ==========================
-Cross corellation can be used for time delay estimation
+This section is a quick overview for the uses of Cross corellation, such as
+time delay estimation and matched filtering (transient detection).
 %}
-
-
-
 % -------------------------------------------------------------------------
 %% 8.5 FIR filter phase
+%{
+Magnitude:  How much of a frequency is allowed to pass.
+Phase:      How long a frequency takes to pass.
+
+The phase of a system signifies how many cycles are required for a given
+frequency to pass through the system. 
+Looking at the derivatives of a system we get the 'phase distortion', also
+called 'group delay'. The group delay can be measured continuously or
+discretly and shows the transmission time at various frequenies. The group
+delay is the negative derivative of the phase. Phase is measured in
+radians, frequency is measured in radians/second, applying the derivative
+leaves seconds.
+Hd
+Tg = -(d*rad/d*rad/sec)
+
+A variation in the delay at certain frequencies causes phase distortion,
+this is noticable in the midrange at 1ms but is more noticable in the bass
+between 2-3ms.
+
+8.5.1 Linear phase ========================================================
+Linear phase occurs when the group delay across all frequencies is the
+same, resulting in a flat phase response. Only FIR filters can produce
+linear phase responses, and only when the coefficients are symmetrical i.e.
+                    h[n]=h[N −n−1],n=0,1,..., N −1
+
+The phase distortion of a linear phase filter is a constant value called
+its 'Latency', written as...
+                    td = (N-1/2*fs)
+The number of taps in a Linear Phase FIR Filter should always be a maximum
+of 2x the buffer length.
+
+As common sense would suggest, the longer the filter, the higher the
+latency. Linear Phase filters introduce an artifact known as pre-echo,
+where ringing occurs around the centre of the filter, due to the
+symmetrical coefficients.
+
+The pre-echo is the biggest downside of linear phase filters, since the
+pre-echo becomes more noticable with steeper filters. The way to counteract
+this is to use a higher order filter, but this requires more taps which
+results in more latency.
+
+8.5.2 Minimum phase =======================================================
+Minimum Phase Filters sacrifice higher amounts of phase distortion for a
+lack of pre-echo and latency. They have the shallowest phase slope of any
+FIR filter, therefore having the least group delay. They are also
+garuanteed to be stable.
+%}
 % -------------------------------------------------------------------------
 %% 8.6 Designing FIR filters
+a_lp
 % -------------------------------------------------------------------------
 %% 8.7 Challenges
 % -------------------------------------------------------------------------
