@@ -83,10 +83,12 @@ y[3] = h[0]⋅x[3] + h[1]⋅x[2] + h[2]⋅x[1] + h[3]⋅x[0] = (1 * 8 + 2 * 7 + 
 %}
 % Analysis
 % ================================================================
-close; plot(h); hold on; plot(x); plot(yLin); plot(yCirc); hold off; 
-legend(["h[n]" "x[n]" "cLin[n]" "cCirc[n]"]);
+close
+plot(linspace(0, length(h), N), h);
+hold on; plot(linspace(0,N, length(yLin)), x); plot(yLin)
+plot(yCirc); legend(["h[n]" "x[n]" "cLin[n]" "cCirc"])
 title(["Convolution of two arbitrary signals " num2str(h) " and " num2str(x)])
-xlabel('Time'); ylabel('Magnitude');
+xlabel('Time'); ylabel('Magnitude')
 % -------------------------------------------------------------------------
 %% 8.4 Cross-correlation
 
