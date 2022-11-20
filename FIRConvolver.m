@@ -64,15 +64,18 @@ classdef FIRConvolver < audioPlugin
             if ~isvector(h) || ~isvector(x)
                 error('Inputs must be vectors.')
             end
-            N = length(x)+length(h)-1;    % Get the impulse response of the convolution
-            y = zeros(N,1);               % Preallocate storage for the output
-            h = plugin.pad(h, N-length(h));      % Pad the end of the vector with zeros
-            x = plugin.pad(x, N-length(x));      % Pad the end of the vector with zeros
+            xLen = length(x);
+            hLen = length(h);
+            N = xLen+hLen-1;    % Get the impulse response of the convolution
+            y = zeros(N,1);     % Preallocate storage for the output
+            % Pad the end of the vector with zeros
+            h = plugin.pad(h, N-hLen);
+            x = plugin.pad(x, N-xLen);
             % for every possible shift amount
             for n=0:N-1
-                for k=0:min(length(h)-1,n)
+                for k=0:min(hLen-1,n)
                     % Check if we are in bounds
-                    if ((n-k)+1 < length(x))
+                    if ((n-k)+1 < xLen)
                         % k is used as the sample index in this context as n is the
                         % length of the convolution.
                         % This index is counting through
@@ -86,10 +89,10 @@ classdef FIRConvolver < audioPlugin
             if ~isvector(h) || ~isvector(x)
                 error('Inputs must be vectors.')
             end
-            N = length(x)+length(h)-1;        % Get the impulse response of the convolution
-            y = zeros(N,1);                   % Preallocate storage for the output
-            h = plugin.pad(h, N-length(h));          % Pad the end of the vector with zeros
-            x = plugin.pad(x, N-length(x));          % Pad the end of the vector with zeros
+            N = length(x)+length(h)-1;          % Get the impulse response of the convolution
+            y = zeros(N,1);                     % Preallocate storage for the output
+            h = plugin.pad(h, N-length(h));     % Pad the end of the vector with zeros
+            x = plugin.pad(x, N-length(x));     % Pad the end of the vector with zeros
             y = ifft(fft(x, N) .* fft(h, N));   % Circular Convolution
         end
         % =================================================================
@@ -143,7 +146,7 @@ classdef FIRConvolver < audioPlugin
             % Perform convolution
             c = plugin.convolve(hPartition, in);
 
-%             c = plugin.fftconvolve(hPartition, in);
+            %                         c = plugin.fftconvolve(hPartition, in);
 
             % Partition the convolution, this will be 1024 + 1024 - 1 in
             % length and will therefore not fit into a frame. We will need
