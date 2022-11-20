@@ -2,5 +2,6 @@
 % updated and looped over within the plugin. We can use the index to index
 % into the partition function.
 function y = getPartitionSize(x, bufferSize)
-y = 1:(length(x)/bufferSize);
+% y = 0:(length(x)/bufferSize)-1;
+y = 0:(length(x)/bufferSize)-1;
 end

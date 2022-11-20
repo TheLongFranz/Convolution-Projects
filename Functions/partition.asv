@@ -1,0 +1,13 @@
+% Partition is a function that returns a chunk of data based on input(x),
+% partitionSize(1024), partitionIdx(1).
+function y = partition(x, bufferSize, idx)
+% if length((x)-bufferSize*idx) > 0
+%     bufferSize = bufferSize - 1;
+% end
+if length(x((bufferSize*idx)+1:bufferSize*(idx+1)) > length(x)-bufferSize
+    y = x((bufferSize*idx)+1:bufferSize*(idx+1)-1);
+else
+    % if buffersize * idx - (idx - idx-1) >
+    y = x((bufferSize*idx)+1:bufferSize*(idx+1));
+end
+end

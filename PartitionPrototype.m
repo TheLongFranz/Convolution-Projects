@@ -8,12 +8,9 @@ bufferIdx = getPartitionSize(x, bufferSize);
 % the chunks together
 y = 0;
 for n = 0:bufferIdx(end)-1
-    [y] = [y  partition(x, bufferSize, bufferIdx(n+1)-1)];
+    [y] = [y ; partition(x, bufferSize, bufferIdx(n+1)-1)];
 end
-y = y';
 y(1) = [];
-
-test = partition(x, bufferSize, bufferIdx(57))
 
 % Functions
 % The Output from function getPartitionSize is an index which can be stored,
@@ -21,9 +18,11 @@ test = partition(x, bufferSize, bufferIdx(57))
 % into the partition function.
 function y = getPartitionSize(x, bufferSize)
 y = 1:(length(x)/bufferSize);
+y = y';
 end
 % Partition is a function that returns a chunk of data based on input(x),
 % partitionSize(1024), partitionIdx(1).
 function y = partition(x, bufferSize, idx)
 y = x((bufferSize*idx)+1:bufferSize*(idx+1));
+y = y';
 end
