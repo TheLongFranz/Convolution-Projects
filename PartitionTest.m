@@ -1,12 +1,16 @@
 clear;clc;close
-[h, fs] = audioread('AudioSamples/SilverVerb_IR.wav'); % Read in the audio
+addpath("Functions"); addpath("AudioSamples"); 
+[h, fs] = audioread('AudioSamples/Guitar.wav'); % Read in the audio
 [h, ~] = midSideEncode(h); % Mono
+x = audioread("AudioSamples/SilverVerb_IR.wav");
+x = x(:);
+% Nfour = 1024
+% Ntwo = .5*Nfour
+% N = .25*Nfour
 
-Nfour = 1024
-Ntwo = .5*Nfour
-N = .25*Nfour
-
-
+% c = fftconvolve(h, x);
+% c = partition(c, length(h), 1);
+sound(h, fs);
 
 % bufferSize = 1024; % set buffer length
 % hLen = length(h);
