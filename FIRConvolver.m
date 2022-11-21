@@ -6,9 +6,9 @@ classdef FIRConvolver < audioPlugin
     end
     % Privately Stored Impulse Response
     properties (Access = private)
-        h = midSideEncode(audioread("AudioSamples/longVerb.wav")); % Store the IR
-        hIdx = 0;
-        cIdx = 0;
+        h = midSideEncode(audioread("AudioSamples/SilverVerb_IR.wav")); % Store the IR
+        m_hIdx = 1;
+        m_cIdx = 1;
     end
     % User Parameters
     properties (Constant)
@@ -91,20 +91,21 @@ classdef FIRConvolver < audioPlugin
             y = ifft(fft(x, N) .* fft(h, N)); % Circular Convolution
         end
         % =================================================================
-        % The Output from function getPartitionSize is an index which can
-        % be stored, updated and looped over within the plugin. We can use
-        % the index to index into the partition function.
-        function y = getPartitionSize(plugin, x, bufferSize)
-            %             y = 0:(length(x)/bufferSize)-1;
-            y = 1:(length(x)/bufferSize)-1;
-            y = y';
-        end
-        % =================================================================
-        % Partition is a function that returns a chunk of data based on
-        % input(x), partitionSize(1024), partitionIdx(1).
-        function y = partition(plugin, x, bufferSize, idx)
-
-            y = x((bufferSize*idx)+1:bufferSize*(idx+1));
+        % Partition is a function that returns a chunk of data based on input(x),
+        % partitionSize(1024), partitionIdx(1). This function outputs a maximum
+        % index that can be used later.
+        function [y, maxIdx] = partition(plugin, x, bufferSize, idx)
+            xLen = length(x);
+            k = 0:(round(xLen/bufferSize))-1; k = k'; % Index used internally
+            maxIdx = max(k)+1;
+            % Calculate the difference between the input and buffer size
+            sampleOverlap = mod(xLen, bufferSize);
+            % If the buffer is too large then make the last
+            if sampleOverlap ~= 0 && idx == maxIdx
+                y = x((bufferSize+1*k(idx)):sampleOverlap*(k(idx)+1)+1);
+            else
+                y = x((bufferSize*k(idx))+1:bufferSize*(k(idx)+1));
+            end
         end
         % =================================================================
         % This function is used in in convolve and fftconvole to 0 pad the
@@ -114,65 +115,62 @@ classdef FIRConvolver < audioPlugin
             x(end+1:end+padLen) = 0; % Pad the end of the vector with zeros
             y = x;
         end
-
-
-
-
-
-
-
-
-
         % =================================================================
         function out = process(plugin, in)
             % Set buffer length
             bufferSize = length(in);
             % Prepare Impulse response
-            h = plugin.normalise(plugin.h, -6);               % Normalise IR Gain
+            h = plugin.normalise(plugin.h, -6); % Normalise IR Gain
+            %--------------------------------------------------------------
             % Partition the IR.wav, iterate through on a frame by frame
             % basis, increasing the buffer index with each frame and
             % reseting it if it goes out of bounds.
-            hRange = plugin.getPartitionSize(h, bufferSize);
-            hPartition = plugin.partition(h, bufferSize, hRange(plugin.hIdx+1));
+            %             plugin.m_hIdx = plugin.m_hIdx + 1; % member variable defaults to zero -\_0-0_/-
+            [~, hMaxIdx] = partition(h, bufferSize, plugin.m_hIdx);
+            fprintf(['Max index for h = ' num2str(hMaxIdx) '\n'])
             % Increment the buffer
-            plugin.hIdx = plugin.hIdx + 1
-            %             Check if we're out of bounds
-            if plugin.hIdx == max(hRange)-1
-                plugin.hIdx = 0;
-            end
-            fprintf(num2str(plugin.hIdx));
+            %             plugin.m_hIdx = plugin.m_hIdx + 1
+            %             %             Check if we're out of bounds
+            %             if plugin.m_hIdx == hMaxIdx-1
+            %                 plugin.m_hIdx = 1;
+            %             end
+            fprintf(num2str(plugin.m_hIdx));
             %             % Convert Input to Mono
             [in, ~] = plugin.midSideEncode(in);
             % Perform convolution
-            c = plugin.convolve(hPartition, in);
-
-            % c = plugin.fftconvolve(hPartition, in);
+            for n = 1:hMaxIdx
+                [hPartition, ~] = partition(h, bufferSize, n);
+                c = plugin.fftconvolve(hPartition, in);
+                c = partition(c, bufferSize, 1);
+                y = (1-plugin.mix) * in + plugin.mix * c;
+                y = 10^(plugin.outputGain/20) * y;
+                out = [y y];
+            end
+            %             c = plugin.fftconvolve(hPartition, in);
 
             % Partition the convolution, this will be 1024 + 1024 - 1 in
             % length and will therefore not fit into a frame. We will need
             % to add the residual to the next frame along.
-            if plugin.cIdx == 0
-                c = plugin.partition(c, bufferSize, plugin.cIdx);
-            else
-                c = plugin.partition(c, bufferSize-1, plugin.cIdx);
-            end
+%             [c1, ~] = partition(c, bufferSize, 1);
+%             [c2, ~] = partition(c, bufferSize, 2);
             % Increment the buffer
-            plugin.cIdx = plugin.cIdx + 1
-            % Check if we're out of bounds
-            if plugin.cIdx == 2
-                plugin.cIdx = 0;
-            end
-            fprintf(num2str(plugin.cIdx));
+            %             plugin.m_cIdx = plugin.m_cIdx + 1
+            %             % Check if we're out of bounds
+            %             if plugin.m_cIdx == cMaxIdx
+            %                 plugin.m_cIdx = 1;
+            %             end
+%             fprintf(num2str(plugin.m_cIdx));
             % Create a wet/dry mix for the output
-            y = (1-plugin.mix) * in + plugin.mix * c;
+%             y = (1-plugin.mix) * in + plugin.mix * c1 + pad(c2, 1);
             %             % Apply overall gain to the output
-            y = 10^(plugin.outputGain/20) * y;
-            out = [in in];
+            %             y = 10^(plugin.outputGain/20) * y;
+%             out = [y y];
+% out = [in in];
         end
         % =================================================================
         function reset(plugin)
-            plugin.hIdx = 0;
-            plugin.cIdx = 0;
+            plugin.m_hIdx = 1;
+            plugin.m_cIdx = 1;
         end
     end
 end

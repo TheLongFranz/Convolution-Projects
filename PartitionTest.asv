@@ -1,26 +1,25 @@
 clear;clc;close
 [h, fs] = audioread('AudioSamples/SilverVerb_IR.wav'); % Read in the audio
 [h, ~] = midSideEncode(h); % Mono
-bufferSize = 1024; % set buffer length
-% hIdx = getPartitionSize(h, bufferSize);
 
-h = partition(h, bufferSize, 1);
+bufferSize = 1024; % set buffer length%
+hLen = length(h);
+[h1, idx] = partition(h, bufferSize, 1)
 
-bufferSize = 1024;
-x = impulse(1, bufferSize/fs, fs);
-% idx = getPartitionSize(x, bufferSize)
+% Gardners fast convolution requires breaking down the ir into chunks 
+% followed by a special setup of overlap/add. Fortunately we can achieve
+% most of this already using our partition function, how
+% for n = 1:idx
+%     n
+%     [h1, ~] = partition(h, bufferSize, n);
+% end
 
+% x = impulse(1, bufferSize/fs, fs);
 % 
-c = convolve(h, x);
-cIdx = getPartitionSize(c, bufferSize);
+% %
+% c = convolve(h1, x);
 % %                 1024
-% c1 = partition(c, bufferSize, 1);
+% [c1, cMaxIdx] = partition(c, bufferSize, 1);
 % %                 1024 - 1
-% c2 = partition(c, bufferSize, 2);
+% [c2, ~] = partition(c, bufferSize, 2);
 % %                 2047
-
-% plot(y)
-% hold on
-% plot(c2)
-
-% buffersizde = buffersize*idx - length(x) > 0 buffersize = buffersize*idx - length(x)
