@@ -6,7 +6,7 @@ classdef FIRConvolver < audioPlugin
     end
     % Privately Stored Impulse Response
     properties (Access = private)
-        h = midSideEncode(audioread("AudioSamples/SilverVerb_IR.wav")); % Store the IR
+        h = audioread("AudioSamples/SilverVerb_IRMono.wav"); % Store the IR
         m_hIdx = 1;
         m_cIdx = 1;
     end
@@ -22,8 +22,6 @@ classdef FIRConvolver < audioPlugin
             'RowHeight',[20,120,20,120,20], ...
             'ColumnWidth',100));
     end
-
-
     % Where the DSP Lives
     methods
         % =================================================================
@@ -116,56 +114,81 @@ classdef FIRConvolver < audioPlugin
             y = x;
         end
         % =================================================================
+        % This function increments a value up to a specified range and
+        % resets if it goes out of bounds
+        function y = increment(plugin, x, xMax)
+            fprintf(['m_hIdx = ' num2str(x) '\n']);
+            y = x + 1;
+            if y == xMax
+                fprintf(['m_hIdx = ' num2str(y) '\n']);
+                y = 1;
+            end
+        end
+        % =================================================================
         function out = process(plugin, in)
+            %             % Set buffer length
+            %             bufferSize = length(in);
+            %             % Prepare Impulse response
+            %             h = plugin.normalise(plugin.h, -6); % Normalise IR Gain
+            %             %--------------------------------------------------------------
+            %             % Partition the IR.wav, iterate through on a frame by frame
+            %             % basis, increasing the buffer index with each frame and
+            %             % reseting it if it goes out of bounds.
+            %             [~, hMaxIdx] = partition(h, bufferSize, plugin.m_hIdx);
+            %             fprintf(['Max index for h = ' num2str(hMaxIdx) '\n'])
+            %             % Increment the buffer
+            %             %             plugin.m_hIdx = plugin.m_hIdx + 1
+            %             %             %             Check if we're out of bounds
+            %             %             if plugin.m_hIdx == hMaxIdx-1
+            %             %                 plugin.m_hIdx = 1;
+            %             %             end
+            %             fprintf(num2str(plugin.m_hIdx));
+            %             %             % Convert Input to Mono
+            %             [in, ~] = plugin.midSideEncode(in);
+            % %             Perform convolution
+            %                 [hPartition, ~] = partition(h, bufferSize, plugin.hIdx);
+            %                 c = plugin.fftconvolve(hPartition, in);
+            %                 c = partition(c, bufferSize, 1);
+            %             %             c = plugin.fftconvolve(hPartition, in);
+            %
+            %             % Partition the convolution, this will be 1024 + 1024 - 1 in
+            %             % length and will therefore not fit into a frame. We will need
+            %             % to add the residual to the next frame along.
+            %             %             [c1, ~] = partition(c, bufferSize, 1);
+            %             %             [c2, ~] = partition(c, bufferSize, 2);
+            %             % Increment the buffer
+            %             %             plugin.m_cIdx = plugin.m_cIdx + 1
+            %             %             % Check if we're out of bounds
+            %             %             if plugin.m_cIdx == cMaxIdx
+            %             %                 plugin.m_cIdx = 1;
+            %             %             end
+            %             %             fprintf(num2str(plugin.m_cIdx));
+            %             % Create a wet/dry mix for the output
+            %             %             y = (1-plugin.mix) * in + plugin.mix * c1 + pad(c2, 1);
+            %             %             % Apply overall gain to the output
+            %             %             y = 10^(plugin.outputGain/20) * y;
+            %             %             out = [y y];
+            %             out = [in in];
+
             % Set buffer length
             bufferSize = length(in);
-            % Prepare Impulse response
-            h = plugin.normalise(plugin.h, -6); % Normalise IR Gain
-            %--------------------------------------------------------------
-            % Partition the IR.wav, iterate through on a frame by frame
-            % basis, increasing the buffer index with each frame and
-            % reseting it if it goes out of bounds.
-            %             plugin.m_hIdx = plugin.m_hIdx + 1; % member variable defaults to zero -\_0-0_/-
-            [~, hMaxIdx] = partition(h, bufferSize, plugin.m_hIdx);
-            fprintf(['Max index for h = ' num2str(hMaxIdx) '\n'])
-            % Increment the buffer
-            %             plugin.m_hIdx = plugin.m_hIdx + 1
-            %             %             Check if we're out of bounds
-            %             if plugin.m_hIdx == hMaxIdx-1
-            %                 plugin.m_hIdx = 1;
-            %             end
-            fprintf(num2str(plugin.m_hIdx));
-            %             % Convert Input to Mono
-            [in, ~] = plugin.midSideEncode(in);
-            % Perform convolution
-            for n = 1:hMaxIdx
-                [hPartition, ~] = partition(h, bufferSize, n);
-                c = plugin.fftconvolve(hPartition, in);
-                c = partition(c, bufferSize, 1);
-                y = (1-plugin.mix) * in + plugin.mix * c;
-                y = 10^(plugin.outputGain/20) * y;
-                out = [y y];
-            end
-            %             c = plugin.fftconvolve(hPartition, in);
 
-            % Partition the convolution, this will be 1024 + 1024 - 1 in
-            % length and will therefore not fit into a frame. We will need
-            % to add the residual to the next frame along.
-%             [c1, ~] = partition(c, bufferSize, 1);
-%             [c2, ~] = partition(c, bufferSize, 2);
-            % Increment the buffer
-            %             plugin.m_cIdx = plugin.m_cIdx + 1
-            %             % Check if we're out of bounds
-            %             if plugin.m_cIdx == cMaxIdx
-            %                 plugin.m_cIdx = 1;
-            %             end
-%             fprintf(num2str(plugin.m_cIdx));
-            % Create a wet/dry mix for the output
-%             y = (1-plugin.mix) * in + plugin.mix * c1 + pad(c2, 1);
-            %             % Apply overall gain to the output
-            %             y = 10^(plugin.outputGain/20) * y;
-%             out = [y y];
-% out = [in in];
+            % Convert input to mono
+            in = plugin.midSideEncode(in);
+
+            % Prepare the impulse response
+            h = plugin.normalise(plugin.h, -1);               % Normalise the gain of the IR
+            [hPartition, hMaxIdx] = plugin.partition(h, bufferSize, plugin.m_hIdx); % Break IR into chunk of N
+            % Increment the partition buffer in order to loop through the IR file
+            plugin.m_hIdx = plugin.increment(plugin.m_hIdx, hMaxIdx);
+
+            c = plugin.fftconvolve(hPartition, in);
+            [cPartition, cMaxIdx] = plugin.partition(c, bufferSize, 1); % Break IR into chunk of N
+
+            y = in + c;
+
+            out = [y y];
+
         end
         % =================================================================
         function reset(plugin)

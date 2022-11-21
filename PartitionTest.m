@@ -8,7 +8,7 @@ N = .25*Nfour
 
 
 
-% bufferSize = 1024; % set buffer length%
+% bufferSize = 1024; % set buffer length
 % hLen = length(h);
 % [h1, idx] = partition(h, bufferSize, 1)
 
