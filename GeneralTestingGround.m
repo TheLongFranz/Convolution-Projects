@@ -4,37 +4,27 @@ addpath("Functions"); addpath("AudioSamples");
 [h, ~] = midSideEncode(h); % Mono
 x = audioread("AudioSamples/SilverVerb_IR.wav");
 x = x(:);
-% Nfour = 1024
-% Ntwo = .5*Nfour
-% N = .25*Nfour
 
-% c = fftconvolve(h, x);
-% c = partition(c, length(h), 1);
-sound(h, fs);
-
+% =========================================================================
+% PARTITION
 % bufferSize = 1024; % set buffer length
 % hLen = length(h);
 % [h1, idx] = partition(h, bufferSize, 1)
 
+% =========================================================================
+% CONVOLUTION
 % Gardners fast convolution requires breaking down the ir into chunks 
 % followed by a special setup of 50% overlap/add. Fortunately we can achieve
 % most of this already using our partition function, however we may need to
 % look at how the overlap/add works and maybe some internal padding in the
 % function.
 
+% Nfour = 1024
+% Ntwo = .5*Nfour
+% N = .25*Nfour
 
-
-% for n = 1:idx
-%     n
-%     [h1, ~] = partition(h, bufferSize, n);
-% end
-
-% x = impulse(1, bufferSize/fs, fs);
-% 
-% %
-% c = convolve(h1, x);
-% %                 1024
-% [c1, cMaxIdx] = partition(c, bufferSize, 1);
-% %                 1024 - 1
-% [c2, ~] = partition(c, bufferSize, 2);
-% %                 2047
+% TODO: MAKE A CLEAR IMPLEMENTATION OF CIRCULAR CONVOLUTION, TEST IT WITH
+% ARBIRARY SIGNALS f = 1:4; g = 5:8; CHECK AGAINST WILL PIRKLE 20.6. 
+% TODO AFTER THAT: COMPARE OVERLAP/ADD & OVERLAP/SAVE SO THAT YOU
+% UNDERSTAND IT, THIS COULD BE DONE IN ISOLATION
+% TODO AFTER THAT: MAKE AN IMPLEMENTATION OF GARDNERS FAST CONVOLUTION
