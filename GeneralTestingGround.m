@@ -5,11 +5,16 @@ addpath("Functions"); addpath("AudioSamples");
 x = audioread("AudioSamples/SilverVerb_IR.wav");
 x = x(:);
 
+linConvolve(h, h, 'true')
+
 % =========================================================================
 % PARTITION
 % bufferSize = 1024; % set buffer length
 % hLen = length(h);
 % [h1, idx] = partition(h, bufferSize, 1)
+
+% =========================================================================
+% OVERLAP/ADD/SAVE
 
 % =========================================================================
 % CONVOLUTION
@@ -23,8 +28,7 @@ x = x(:);
 % Ntwo = .5*Nfour
 % N = .25*Nfour
 
-% TODO: MAKE A CLEAR IMPLEMENTATION OF CIRCULAR CONVOLUTION, TEST IT WITH
-% ARBIRARY SIGNALS f = 1:4; g = 5:8; CHECK AGAINST WILL PIRKLE 20.6. 
+
 % TODO AFTER THAT: COMPARE OVERLAP/ADD & OVERLAP/SAVE SO THAT YOU
 % UNDERSTAND IT, THIS COULD BE DONE IN ISOLATION
 % TODO AFTER THAT: MAKE AN IMPLEMENTATION OF GARDNERS FAST CONVOLUTION

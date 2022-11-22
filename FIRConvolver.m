@@ -6,8 +6,7 @@ classdef FIRConvolver < audioPlugin
     end
     % Privately Stored Impulse Response
     properties (Access = private)
-        %         h = audioread("AudioSamples/SilverVerb_IRMono.wav"); % Store the IR
-        h = audioread("AudioSamples/cabinets/48/C414/TS/C414_TS_1_inch_cone_far_pres_1.wav"); % Store the IR
+        h = audioread("AudioSamples/SilverVerb_IRMono.wav"); % Store the IR
         m_hIdx = 1;
         m_cIdx = 1;
     end
@@ -27,7 +26,7 @@ classdef FIRConvolver < audioPlugin
     methods
         % =================================================================
         % Gain Normalise
-        function y = normalise(plugin, x, gaindBFS)
+        function y = normalise(~, x, gaindBFS)
             % Difference Equation
             % y[n] = gaindBFS * (x[n]/max(x))
             [~, C] = size(x);
@@ -41,7 +40,7 @@ classdef FIRConvolver < audioPlugin
         end
         % =================================================================
         % Mid Side Encode Function
-        function [yMid, ySide] = midSideEncode(plugin, x)
+        function [yMid, ySide] = midSideEncode(~, x)
             [~, C] = size(x);
             if C == 1
                 yMid = x;
@@ -53,8 +52,8 @@ classdef FIRConvolver < audioPlugin
             end
         end
         % =================================================================
-        % FIRConvolve function
-        function [y] = convolve(plugin, h, x)
+        % This function is an implementation of linear time-domain convolution
+        function [y] = linConvolve(plugin, h, x)
             if ~isvector(h) || ~isvector(x)
                 error('Inputs must be vectors.')
             end
@@ -77,13 +76,12 @@ classdef FIRConvolver < audioPlugin
             end
         end
         % =================================================================
-        function [y] = fftconvolve(plugin, h, x)
+        function [y] = circConvolve(plugin, h, x)
             if ~isvector(h) || ~isvector(x)
                 error('Inputs must be vectors.\n')
             end
             hLen = length(h); xLen = length(x); % IR = xLen + hLen - 1
             N = hLen+xLen-1; % Get the impulse response of the convolution
-            y = zeros(N,1); % Preallocate storage for the output
             % Pad the end of the vector with zeros
             h = plugin.zeroPad(h, N-hLen); x = plugin.zeroPad(x, N-xLen);
             % Process the output
@@ -93,8 +91,12 @@ classdef FIRConvolver < audioPlugin
         % Partition is a function that returns a chunk of data based on input(x),
         % partitionSize(1024), partitionIdx(1). This function outputs a maximum
         % index that can be used later.
-        function [y, maxIdx] = partition(plugin, x, bufferSize, idx)
+        function [y, maxIdx] = partition(~, x, bufferSize, idx)
             xLen = length(x);
+            if xLen < bufferSize
+                fprintf(['Input length of ' num2str(xLen) ' is less than buffer size '...
+                    num2str(bufferSize) '.\nCannot Partition.\n']);
+            end
             k = 0:(round(xLen/bufferSize))-1; k = k'; % Index used internally
             maxIdx = max(k)+1;
             % Calculate the difference between the input and buffer size
@@ -109,7 +111,7 @@ classdef FIRConvolver < audioPlugin
         % =================================================================
         % This function is used in in convolve and fftconvole to 0 pad the
         % edges of the signal.
-        function y = zeroPad(plugin, x, padLen)
+        function y = zeroPad(~, x, padLen)
             x = x(:);                % Convert input to vector
             x(end+1:end+padLen) = 0; % Pad the end of the vector with zeros
             y = x;
@@ -117,7 +119,7 @@ classdef FIRConvolver < audioPlugin
         % =================================================================
         % This function increments a value up to a specified range and
         % resets if it goes out of bounds
-        function y = increment(plugin, x, xMax)
+        function y = increment(~, x, xMax)
             y = x + 1;
             if y == xMax
                 y = 1;
@@ -125,7 +127,7 @@ classdef FIRConvolver < audioPlugin
         end
         % =================================================================
         % This function multiplies a signal by a gain value in dBFS
-        function y = gain(plugin, x, gaindBFS)
+        function y = gain(~, x, gaindBFS)
             y = x * 10^(gaindBFS/20);
         end
         % =================================================================
@@ -134,21 +136,21 @@ classdef FIRConvolver < audioPlugin
             bufferSize = length(in);
             % Convert input to mono
             in = plugin.midSideEncode(in);
-
             % Prepare the impulse response
-            h = plugin.normalise(plugin.h, -1);               % Normalise the gain of the IR
-            [hPartition, hMaxIdx] = plugin.partition(h, bufferSize, 1); % Break IR into chunk of N
+            h = plugin.normalise(plugin.h, -1); % Normalise the gain of the IR
+            [hPartition, hMaxIdx] = plugin.partition(h, bufferSize, plugin.m_hIdx); % Break IR into chunk of N
             % Increment the partition buffer in order to loop through the IR file
+            %             plugin.m_hIdx = plugin.increment(plugin.m_hIdx, hMaxIdx);
             plugin.m_hIdx = plugin.increment(plugin.m_hIdx, hMaxIdx);
 
             % Perform Convolution
-            c = plugin.fftconvolve(hPartition, in);
-            [cPartition, cMaxIdx] = plugin.partition(c, bufferSize, 1); % Break IR into chunk of N
+            c = plugin.circConvolve(hPartition, in);
+            [cPartition, ~] = plugin.partition(c, bufferSize, 1); % Break IR into chunk of N
 
             y = (1-plugin.mix)*in + plugin.mix*real(cPartition);
-            y = plugin.gain(y, plugin.outputGain)
-            out = [y y]
+            y = plugin.gain(y, plugin.outputGain);
 
+            out = [y y];
         end
         % =================================================================
         function reset(plugin)

@@ -1,4 +1,6 @@
-function [y] = convolve(h, x)
+% This function is an implementation of linear time-domain convolution
+
+function [y] = linConvolve(h, x)
 if ~isvector(h) || ~isvector(x)
     error('Inputs must be vectors.')
 end

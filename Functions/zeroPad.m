@@ -1,4 +1,4 @@
-function y = pad(x, padLen)
+function y = zeroPad(x, padLen)
 if ~isvector(x)
     error('Input must be a vector.')
 end
