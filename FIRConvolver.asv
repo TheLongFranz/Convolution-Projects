@@ -143,9 +143,10 @@ classdef FIRConvolver < audioPlugin
         % This function increments a value up to a specified range and
         % resets if it goes out of bounds
         function y = decrement(~, x, xMax)
-            y = xMax - x;
-            if y == xMax
-                y = 1;
+            idx = x + 1
+            y =
+            if idx == xMax
+                idx = 1
             end
         end
         % =================================================================
@@ -160,10 +161,12 @@ classdef FIRConvolver < audioPlugin
             % Convert input to mono
             in = plugin.midSideEncode(in);
             % Prepare the impulse response
-            h = plugin.normalise(plugin.h, -3); % Normalise the gain of the IR
+            h = plugin.normalise(plugin.h, -1); % Normalise the gain of the IR
             [hPartition, hMaxIdx] = plugin.partition(h, bufferSize, plugin.m_hIdx); % Break IR into chunk of N
             % Increment the partition buffer in order to loop through the IR file
             plugin.m_hIdx = plugin.increment(plugin.m_hIdx, hMaxIdx);
+            % Try convolving in reverse
+            plugin.m_hIdx = plugin.decrement(-plugin.m_hIdx, hMaxIdx)
 
             % Perform Convolution
             cPartition = plugin.circConvolve(hPartition, in);

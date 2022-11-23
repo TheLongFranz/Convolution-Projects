@@ -36,16 +36,6 @@ This is too slow for real time processing.}
 CIRCULAR convolution processing time: 0*(N log(N))
 Very fast.
 
-Zero padding can be used to make circular convolution yield the same
-results as linear convolution. It can also be used to ensure that the input
-signals are both a length that is a power of two, this is necessary for
-the Fast Fourier Transform to work.
-
-Performing circular convolution:
-        c[n] = ifft(fft(x[n], k) * fft(h[n], k), k);
-Using k point fft and ifft algorithms and then extracting the original
-sample size we had before zero padding.
-
 
 
 %}
