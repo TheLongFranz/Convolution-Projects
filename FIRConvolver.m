@@ -53,7 +53,7 @@ classdef FIRConvolver < audioPlugin
         end
         % =================================================================
         % This function is an implementation of linear time-domain convolution
-        function [y] = linConvolve(plugin, h, x)
+        function [y] = linConvolve(~, h, x)
             if ~isvector(h) || ~isvector(x)
                 error('Inputs must be vectors.')
             end
@@ -64,9 +64,9 @@ classdef FIRConvolver < audioPlugin
             h = plugin.zeroPad(h, N-hLen); x = plugin.zeroPad(x, N-xLen);
             % for every possible shift amount
             for n=0:N-1
-                for k=0:min(hLen-1,n)
+                for k=0:min(length(h)-1,n)
                     % Check if we are in bounds
-                    if ((n-k)+1 < xLen)
+                    if ((n-k)+1 < length(x))
                         % k is used as the sample index in this context as n is the
                         % length of the convolution.
                         % This index is counting through
@@ -76,15 +76,29 @@ classdef FIRConvolver < audioPlugin
             end
         end
         % =================================================================
-        function [y] = circConvolve(plugin, h, x)
+        % The circConvolve function is an implementation of circular
+        % convolution, this will only function if both inputs are the same
+        % length.
+        function y = circConvolve(~, h, x)
             if ~isvector(h) || ~isvector(x)
                 error('Inputs must be vectors.\n')
+            else
+                if length(h) ~= length(x)
+                    error('Inputs must be the same size.\n')
+                end
             end
-            hLen = length(h); xLen = length(x); % IR = xLen + hLen - 1
-            N = hLen+xLen-1; % Get the impulse response of the convolution
-            % Pad the end of the vector with zeros
-            h = plugin.zeroPad(h, N-hLen); x = plugin.zeroPad(x, N-xLen);
             % Process the output
+            y = ifft(fft(x) .* fft(h));   % Circular Convolution
+        end
+        % =================================================================
+        % The circToLinConvolve function is an implementation of circular
+        % convolution with an N length FFT and zero-padded inputs, this
+        % causes the output to be identical to linConvolve.
+        function y = circToLinConvolve(h, x)
+            N = length(x)+length(h)-1;        % Get the impulse response of the convolution
+            y = zeros(N,1);                   % Preallocate storage for the output
+            h = zeroPad(h, N-length(h));      % Pad the end of the vector with zeros
+            x = zeroPad(x, N-length(x));      % Pad the end of the vector with zeros
             y = ifft(fft(x, N) .* fft(h, N)); % Circular Convolution
         end
         % =================================================================
@@ -144,8 +158,10 @@ classdef FIRConvolver < audioPlugin
             plugin.m_hIdx = plugin.increment(plugin.m_hIdx, hMaxIdx);
 
             % Perform Convolution
-            c = plugin.circConvolve(hPartition, in);
-            [cPartition, ~] = plugin.partition(c, bufferSize, 1); % Break IR into chunk of N
+            cPartition = plugin.circConvolve(hPartition, in);
+            % Partitioning is not necessary with the circConvolve function
+            % as the output is the same length as the longest input.
+            %             [cPartition, ~] = plugin.partition(c, bufferSize, 1); % Break IR into chunk of N
 
             y = (1-plugin.mix)*in + plugin.mix*real(cPartition);
             y = plugin.gain(y, plugin.outputGain);
@@ -153,6 +169,8 @@ classdef FIRConvolver < audioPlugin
             out = [y y];
         end
         % =================================================================
+        % The reset function returns class properties to their default
+        % values
         function reset(plugin)
             plugin.m_hIdx = 1;
             plugin.m_cIdx = 1;

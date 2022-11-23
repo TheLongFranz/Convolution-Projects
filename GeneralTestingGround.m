@@ -5,14 +5,13 @@ addpath("Functions"); addpath("AudioSamples");
 % x = audioread("AudioSamples/SilverVerb_IR.wav");
 % x = x(:);
 
-h = 1:4;
-x = 5:8;
+x = 1:4;
+h = 5:8;
 
-c = linConvolve(h, x)
-c1 = conv(h, x)
-c2 = circConvolve(h, x)
-c3 = circToLinConvolve(h, x)
-c4 = convolve(h, x)
+% c = linConvolve(h, x);
+% c1 = conv(h, x);
+c2 = circConvolve(h, x);
+% c3 = circToLinConvolve(h, x);
 
 % =========================================================================
 % PARTITION
@@ -22,6 +21,7 @@ c4 = convolve(h, x)
 
 % =========================================================================
 % OVERLAP/ADD/SAVE
+
 
 % =========================================================================
 % CONVOLUTION
@@ -36,6 +36,10 @@ c4 = convolve(h, x)
 % N = .25*Nfour
 
 
-% TODO AFTER THAT: COMPARE OVERLAP/ADD & OVERLAP/SAVE SO THAT YOU
-% UNDERSTAND IT, THIS COULD BE DONE IN ISOLATION
+% TODO: COMPARE OVERLAP/ADD & OVERLAP/SAVE SO THAT YOU
+% UNDERSTAND IT, THIS COULD BE DONE IN ISOLATION. MAKE THIS AS AN EXTENSION
+% OF THE PARTITION FUNCTION SINCE OVERLAP/ADD SEEMS TO BE A COMBINATION OF
+% PARTITION AND ZEROPAD. THIS WILL LIKELY NEED TO BE A CLASS SO THAT YOU
+% CAN KEEP TRACK OF OVERLAP-1.
+
 % TODO AFTER THAT: MAKE AN IMPLEMENTATION OF GARDNERS FAST CONVOLUTION
