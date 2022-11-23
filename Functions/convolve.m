@@ -15,10 +15,10 @@ for n=0:len-1
         if ((n-k)+1 < length(x))
             % ‘+1’ in every array argument since Matlab sequences start
             % at index 1 (and not 0, like other programming languages)
-%             y(n+1) = y(n+1) + h(k+1)*x((n-k)+1);
-y(n+1) = h(k+1)*x((n-k)+1);
+            %             y(n+1) = y(n+1) + h(k+1)*x((n-k)+1);
+            y(n+1) = y(n+1) + h(k+1)*x((n-k)+1);
+            fprintf(['y(' num2str(n) ') = ' num2str(y(n+1)) ' + ' num2str(h(k+1)) ' * ' num2str(x((n-k)+1)) '\n']);
         end
     end
 end
-y
 end

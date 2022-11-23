@@ -11,7 +11,7 @@ x = 5:8;
 c = linConvolve(h, x)
 c1 = conv(h, x)
 c2 = circConvolve(h, x)
-c3 = circToLinConvolve(h, x)
+c3 = circToLinConvolve()
 
 % =========================================================================
 % PARTITION
