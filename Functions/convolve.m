@@ -2,10 +2,12 @@ function [y] = convolve(h, x)
 if ~isvector(h) || ~isvector(x)
     error('inputs must be vectors')
 end
+
 % Prepare Output
 len = length(x)+length(h)-1;
 y = zeros(len,1);
-
+h = zeroPad(h, len-length(h));
+x = zeroPad(x, len-length(x));
 % for every possible shift amount
 for n=0:len-1
     % for every k from 0 to n; except before complete overlap
@@ -17,7 +19,6 @@ for n=0:len-1
             % at index 1 (and not 0, like other programming languages)
             %             y(n+1) = y(n+1) + h(k+1)*x((n-k)+1);
             y(n+1) = y(n+1) + h(k+1)*x((n-k)+1);
-            fprintf(['y(' num2str(n) ') = ' num2str(y(n+1)) ' + ' num2str(h(k+1)) ' * ' num2str(x((n-k)+1)) '\n']);
         end
     end
 end
