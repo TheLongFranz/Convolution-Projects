@@ -13,6 +13,9 @@ x = audioread("AudioSamples/SilverVerb_IRMono.wav");
 % [h1, idx] = partition(h, bufferSize, 1)
 
 % =========================================================================
+% DISCRETE FOURIER TRANSFORM
+
+% =========================================================================
 % OVERLAP/ADD/SAVE
 
 

@@ -1,5 +1,11 @@
 %% Add dependencies and reset the environment
 addpath('Functions'); addpath('AudioSamples'); clear;clc;close
+
+
+
+
+
+
 % -------------------------------------------------------------------------
 % Notes for Digital Audio Theory - A Practical Guide Chapter 9: Z-Domain
 % -------------------------------------------------------------------------
