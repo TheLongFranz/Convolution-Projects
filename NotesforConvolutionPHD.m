@@ -1,5 +1,6 @@
 % -------------------------------------------------------------------------
-% Notes from Frank Wefers Partitioned convolution algorithms for real-time auralization
+% Notes from Frank Wefers Partitioned convolution algorithms for real-time
+% auralization PHD Thesis
 % -------------------------------------------------------------------------
 %{
 4.1.1. Overlap-Add
