@@ -51,9 +51,7 @@ Assuming a gain of 1, h may be written as
 % -------------------------------------------------------------------------
 %% 8.3 Convolution
 %{
-Convolution can be defined as a Finite Impulse Response Filter with an
-impulse response of the length of the first function x[N] + the length of the
-second function h[N] -1.
+Convolution can be defined as a Finite Impulse Response Filter with an impulse response of the length of the first function x[N] + the length of the second function h[N] -1.
 
 Convolution has the following properties
 1. Commutative -  h[n] * x[n] = x[n] * h[n]
@@ -62,7 +60,6 @@ Convolution has the following properties
 
 We will demonstrate using filter with the following impulse response 
 (Remembering that the impulse response is determined by the coefficients)
-<<<<<<< HEAD
 h[n] = [a0, a1, a2, a3] on an arbitrary signal x. The convolution matrix
 (Generally the IR Signal) can also be called the kernel.
 For a full convolution we must zero pad the end of the vectors to match the
@@ -84,7 +81,7 @@ y[3] = h[0]⋅x[3] + h[1]⋅x[2] + h[2]⋅x[1] + h[3]⋅x[0] = (1 * 8 + 2 * 7 + 
 %}
 % Analysis
 % =========================================================================
-close; plot(h); hold on; plot(x); plot(yLin); plot(yCirc); hold off; 
+close; plot(h); hold on; plot(x); plot(yLin); %plot(yCirc); hold off; 
 legend(["h[n]" "x[n]" "cLin[n]" "cCirc[n]"]);
 title(["Convolution of two arbitrary signals " num2str(h) " and " num2str(x)])
 xlabel('Time'); ylabel('Magnitude');

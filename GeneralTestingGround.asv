@@ -4,17 +4,8 @@ addpath("Functions"); addpath("AudioSamples");
 [h, ~] = midSideEncode(h); % Mono
 x = audioread("AudioSamples/SilverVerb_IRMono.wav");
 X = Z(x);
-x1 = complexSineWave(5, -10, 1, 1, fs);
-X1 = Z(x1);
-x2 = sineWave(5, -10, 1, 1, fs);
-X2 = Z(x2);
-
 plot(X)
-hold on
-plot(X1)
-plot(X2)
-axis([-1 1 -1 1])
-legend(["Silverb IR" "Complex Sine wave with f = 5Hz" "Sine wave with f = 5Hz"]);
+axis([- 1 1 -1])
 
 % =========================================================================
 % PARTITION
@@ -77,3 +68,20 @@ sample size we had before zero padding.
 % CAN KEEP TRACK OF OVERLAP-1.
 
 % TODO AFTER THAT: MAKE AN IMPLEMENTATION OF GARDNERS FAST CONVOLUTION
+
+function y = Z(x)
+% Maths
+e = 2.712821828;
+% j = sqrt(-1); % Matlab has a built in type for i & j called '1i'
+k2pi = 2*pi;
+% y = zeros(length(x));
+N = length(x);
+for n = 0:N-1
+    Z = e^(1i*k2pi*-n+1);
+    y(n+1) = x(n+1) * Z;
+
+    % Calculate the multiplication of complex sinusoid and 'z = exp(-jwn)'
+    % h1  = cos(w*t) * cos(w*n*T)    + cos(w*n*T) * 1i*sin(w*t)...
+    %     - cos(w*t) * 1i*sin(w*n*T) + sin(w*t)   * sin(w*n*T);
+end
+end
