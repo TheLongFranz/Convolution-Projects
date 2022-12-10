@@ -12,7 +12,7 @@ else
     end
 
     %% Processing
-    N = lengthInSeconds*fs;
+    N = round(lengthInSeconds*fs);
     y = zeros(N, numChannels);
     ts = [0:(lengthInSeconds*fs)-1] * 1/fs';
     for c = 1:numChannels

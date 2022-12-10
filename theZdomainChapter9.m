@@ -92,23 +92,26 @@ have on an input. This is described as a ratio of the output over the input.
 %}
 % x = [.1 .2 .3 .4];
 close
+clc
 fs = 48000;
 x = sineWave(1000, -6, 1, .01, fs);
-X = Z(x);
-subplot(2, 1, 1)
-plot(real(X))
-hold on
-plot(x)
-hold off
-axis tight
-title(["Z = e^(1i*k2pi*n+1)-n; y(n+1) = x(n+1) * Z;" "plot(real(X))"])
-subplot(2, 1, 2)
-plot(imag(X))
-hold on
-plot(x)
-hold off
-axis tight
-title(["Z = e^(1i*k2pi*n+1)-n; y(n+1) = x(n+1) * Z;" "plot(imag(X))"])
+
+X = Z(x, fs, 8)
+
+% subplot(2, 1, 1)
+% plot(real(X))
+% hold on
+% plot(x)
+% hold off
+% axis tight
+% title(["Z = e^(1i*k2pi*n+1)-n; y(n+1) = x(n+1) * Z;" "plot(real(X))"])
+% subplot(2, 1, 2)
+% plot(imag(X))
+% hold on
+% plot(x)
+% hold off
+% axis tight
+% title(["Z = e^(1i*k2pi*n+1)-n; y(n+1) = x(n+1) * Z;" "plot(imag(X))"])
 % plot(linspace(0, fs, length(x)), 20*log10(((X))))
 % hold on
 % plot(linspace(0, fs, length(x)), 20*log10(((x))))
