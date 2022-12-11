@@ -27,7 +27,6 @@ y = zeros(length(x), 1);
 
 for n = 0:length(x)-1
     w = (k2pi*n)/N;
-    Z = cos(w*n) + 1i*sin();
-%     y(n+1) = x(n+1) * e^-(1i*k2pi*(K(idx)/N)*n+1);
-    y(n+1) = x(n+1) * cos(w*n+1) + x(n+1) * 1i*sin(w*n+1);
+    Z = exp(-1i*w*n+1);
+    y(n+1) = y(n+1) * Z;
 end

@@ -17,6 +17,6 @@ else
     y = zeros(N, numChannels);
     ts = (0:(lengthInSeconds*fs)-1) * 1/fs';
     for c = 1:numChannels
-        y(:, c) = 10^(gaindBFS/20)*(cos(w*ts) + 1i*sin(w*ts));
+        y(:, c) = 10^(gaindBFS/20)*exp(-1i*w*ts);
     end
 end

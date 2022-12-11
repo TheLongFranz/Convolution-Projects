@@ -1,26 +1,26 @@
-function y = dft(x, fs)
-e = 2.7182818284590452353602874713527;
-% Euler's number. exp(x) is equavelant to e^x
-j = sqrt(-1);
-% The imaginary number, also known as the phase rotation operator
-% multiplying a signal by j results in a 90º phase shift
+function y = dft(x, dftlen)
 [N, C] = size(x);
 y = zeros(N, C);
-w = zeros(N, C)
-
-
-w = linspace(-pi, pi, 8)';
-Z = e.^(j*w)';
-% T = 1/fs
-% The complex sinusoid
-for c = 1:C
-    for n = 1:N
-        w(n, c) = (2*pi*n)/N;
-        y(n, c) = x(n, c) .* e^(j*w(n));
+%{
+for BIN = 1:dftlen
+    for n = 1:dftlen
+        y(BIN)  = y(BIN)  + x(n) * exp(-1i*k2pi*BIN*n/dftlen) / dftlen;
+        re(BIN) = re(BIN) + x(n) * cos(k2pi*BIN*n/dftlen)     / dftlen;
+        im(BIN) = im(BIN) - x(n) * sin(k2pi*BIN*n/dftlen)     / dftlen;
     end
 end
-% The input signal is multiplied element-wise with a sinusoid of
-% frequency = w/(2*pi). The product of this is the energy at that
-% frequency.
+              N
+X(k) =       sum  x(n)*exp(-j*2*pi*(k-1)*(n-1)/N), 1 <= k <= N.
+             n=1
+We can use the complex notation or break the complex signal into its real
+and imaginary components using Euler's equation.
+Eulers Equation: e^(-j*w*n) = cos(w*n) + j*sin(w*n)
+%}
+
+for k = 0:N-1
+    for n = 0:dftlen-1
+        y(k+1) = y(k+1) + x(n+1) * exp(-1i * 2*pi * (k-1) * (n-1)/N);
+    end
+end
 
 end % End of DFT Function
