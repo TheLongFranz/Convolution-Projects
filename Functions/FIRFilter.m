@@ -1,6 +1,6 @@
 function [y] = FIRFilter(x, k, a)
 % Convert the input signal to a row vector
-x = [x, 0]; % Zero pad 'x' to allow for the size increase due to the filter order
+x = [x, zeros(k)]; % Zero pad 'x' to allow for the size increase due to the filter order
 % in c++ x.push_back(0)
 idx = 1; idx1 = 1; % Reset before each loop
 % fprintf('\nOutput\n');

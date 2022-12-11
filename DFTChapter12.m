@@ -15,6 +15,7 @@ performed discretely in samples rather than continuously. (No shit Sherlock)
 %% 12.2 Sampling the frequency response
 % -------------------------------------------------------------------------
 %% 12.3 The DFT and inverse discrete Fourier transform
+fs = 48000; x = sineWave(10000, -6, 1, .01, fs); y = dft(x, 64); plot(linspace(0, fs, length(x)), 20*log10(abs(y)));
 % -------------------------------------------------------------------------
 %% 12.4 Twiddle factor
 % -------------------------------------------------------------------------

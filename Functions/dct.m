@@ -1,7 +1,6 @@
-function y = dft(x, dftlen)
+function y = dct(x, dftlen)
 [N, C] = size(x);
 y = zeros(N, C);
-
 %{
 for BIN = 1:dftlen
     for n = 1:dftlen
@@ -17,23 +16,10 @@ We can use the complex notation or break the complex signal into its real
 and imaginary components using Euler's equation.
 Eulers Equation: e^(-j*w*n) = cos(w*n) + j*sin(w*n)
 %}
-% for k = 0:N-1
-%     for n = 0:dftlen-1
-%         yDFT(k+1) = yDFT(k+1) + x(n+1) * exp(-1i * k2pi * k * n/N);
-%     end
-% end
 
-if nargin == 1
-    for k = 0:N-1
-        for n = 0:N-1
-            y(k+1) = y(k+1) + x(n+1) * exp(-1i * 2*pi * k * n/N);
-        end
-    end
-else
-    for k = 0:N-1
-        for n = 0:dftlen-1
-            y(k+1) = y(k+1) + x(n+1) * exp(-1i * 2*pi * k * n/N);
-        end
+for k = 0:N-1
+    for n = 0:dftlen-1
+        y(k+1) = y(k+1) + x(n+1) * cos(2*pi * k * n/N);
     end
 end
 
